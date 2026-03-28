@@ -4,38 +4,23 @@ phases:
   pre_build:
     commands:
       - echo "=== Build Context ==="
-      - echo "Build ID: $CODEBUILD_BUILD_ID"
-      - echo "Project: $CODEBUILD_PROJECT_NAME"
-      - echo "Initiator: $CODEBUILD_INITIATOR"
-      - echo "Start time: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-      - echo ""
-      - echo "=== Source Variables (CODEBUILD_*) ==="
-      - env | sort | grep -E '^CODEBUILD_(SRC_DIR|SOURCE_|RESOLVED_SOURCE_VERSION)'
-      - echo ""
+      - echo "Build ID  - $CODEBUILD_BUILD_ID"
+      - echo "Project   - $CODEBUILD_PROJECT_NAME"
+      - echo "Initiator - $CODEBUILD_INITIATOR"
+      - echo "Timestamp - $(date -u)"
+      - echo "=== Source Variables ==="
+      - env | sort | grep -E "^CODEBUILD_(SRC_DIR|SOURCE_|RESOLVED_SOURCE_VERSION)" || true
       - echo "=== Source Directories ==="
-      - |
-        for var_name in $(env | awk -F= '/^CODEBUILD_SRC_DIR/ {print $1}' | sort); do
-          src_dir=$(printenv "$var_name")
-          echo "--- $var_name=$src_dir"
-          if [ -d "$src_dir" ]; then
-            echo "Top-level files:"
-            ls -la "$src_dir" | sed -n '1,80p'
-            echo "Sample tree:"
-            find "$src_dir" -maxdepth 3 -type f | sed -n '1,120p'
-          else
-            echo "Directory not found: $src_dir"
-          fi
-          echo ""
-        done
+      - for var_name in $(env | grep "^CODEBUILD_SRC_DIR" | cut -d= -f1 | sort); do src_dir=$(printenv "$var_name"); echo "--- $var_name = $src_dir"; if [ -d "$src_dir" ]; then echo "Top-level listing"; ls -la "$src_dir" 2>/dev/null | head -80; echo "File tree (depth 3)"; find "$src_dir" -maxdepth 3 -type f 2>/dev/null | head -120; else echo "Directory not found - $src_dir"; fi; echo ""; done
 
   build:
     commands:
-      - echo "No build action. This pre-run buildspec only inspects source artifacts."
+      - echo "No build action - pre-run inspection only"
 
   post_build:
     commands:
       - echo "=== Inspection Complete ==="
-      - echo "Finished at: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+      - echo "Finished at $(date -u)"
 
 artifacts:
   files:

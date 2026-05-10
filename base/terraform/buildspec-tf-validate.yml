@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    TF_DIR: <TF_DIR>
+    TARGET_TF_MODULE_DIR: <TARGET_TF_MODULE_DIR>
 
 phases:
   install:
@@ -13,6 +13,7 @@ phases:
 
   build:
     commands:
-      - terraform -chdir=$TF_DIR init
-      - terraform -chdir=$TF_DIR fmt -check
-      - terraform -chdir=$TF_DIR validate
+      - export CHDIR="$CODEBUILD_SRC_DIR_WORK/$TARGET_TF_MODULE_DIR"
+      - terraform -chdir=$CHDIR init
+      - terraform -chdir=$CHDIR fmt -check
+      - terraform -chdir=$CHDIR validate

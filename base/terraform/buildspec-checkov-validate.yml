@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     TARGET_TF_MODULE_DIR: <TARGET_TF_MODULE_DIR>
-    CHECKOV_ARGS: "--soft-fail --quiet -o junitxml > checkov-report.xml"
+    CHECKOV_ARGS: "--soft-fail --quiet -o junitxml"
 
 phases:
   install:
@@ -17,7 +17,7 @@ phases:
     commands:
       - export CHDIR="$CODEBUILD_SRC_DIR_WORK/$TARGET_TF_MODULE_DIR"
       - test -d "$CHDIR"
-      - checkov -d "$CHDIR" $CHECKOV_ARGS
+      - checkov -d "$CHDIR" $CHECKOV_ARGS > checkov-report.xml
 
 reports:
   checkov-report:

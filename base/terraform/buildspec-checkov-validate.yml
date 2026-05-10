@@ -1,0 +1,26 @@
+version: 0.2
+
+env:
+  variables:
+    TARGET_TF_MODULE_DIR: <TARGET_TF_MODULE_DIR>
+    CHECKOV_ARGS: "--soft-fail --quiet -o junitxml > checkov-report.xml"
+
+phases:
+  install:
+    commands:
+      - python3 --version
+      - pip3 --version
+      - pip3 install --upgrade pip
+      - pip3 install checkov
+
+  build:
+    commands:
+      - export CHDIR="$CODEBUILD_SRC_DIR_WORK/$TARGET_TF_MODULE_DIR"
+      - test -d "$CHDIR"
+      - checkov -d "$CHDIR" $CHECKOV_ARGS
+
+reports:
+  checkov-report:
+    files:
+      - checkov-report.xml
+    file-format: JUNITXML
